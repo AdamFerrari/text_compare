@@ -4,13 +4,14 @@ require './doc'
 CUTOFF = 0.75
 
 if(ARGV.length != 1)
-  $stderr.puts "usage: ruby find_matches.rb <file path>"
+  $stderr.puts "usage: ruby find_matches.rb <xslx path>"
   exit 1
 end
 path = ARGV[0]
-corpus = Corpus.new(path)
-corpus.docs.each do |doc|
+corpus = Corpus.new
+corpus.read_xsl(path)
 
+corpus.docs.each do |doc|
   corpus.docs.each do |compare_doc|
     if compare_doc.id > doc.id
       similarity = doc.compare(compare_doc, corpus)

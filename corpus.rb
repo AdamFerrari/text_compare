@@ -1,4 +1,5 @@
 require 'csv'
+require 'roo'
 require './doc'
 
 class Corpus
@@ -7,13 +8,21 @@ class Corpus
   # Assume corpus comes as a single-column csv, with a raw document per row.
   # Using csv instead of raw lines allows for multi-line documents.
   #
-  def initialize(path)
+  def initialize()
     @doc_count = 0
     @docs = []
+  end
+
+  def read_csv(path)
     CSV.foreach(path) do |row|
-      doc = Doc.new(@doc_count, row[0])
-      @docs << doc
-      accumulate(doc)
+      accumulate(Doc.new(@doc_count, row[0]))
+    end
+  end
+
+  def read_xsl(path)
+    xlsx = Roo::Spreadsheet.open(path)
+    xlsx.each_row_streaming do |row|
+      accumulate(Doc.new(@doc_count, row[0].to_s))
     end
   end
 
@@ -32,6 +41,7 @@ class Corpus
   private
 
   def accumulate(doc)
+    @docs << doc
     @doc_count = @doc_count + 1
     doc.vocab.each do |term|
       term_counts[term] = (term_counts[term] || 0) + 1
