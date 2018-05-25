@@ -52,4 +52,18 @@ class Doc
       self_vec.dot(other_vec) / (self_vec.magnitude * other_vec.magnitude)
   end
 
+  def scored_comparison_terms(other_doc, corpus)
+    contribs = Hash.new
+    corpus.vocab.each { |tok| contribs[tok] = 0.0 }
+    self_vec = vectorize(corpus)
+    other_vec = other_doc.vectorize(corpus)
+    i = 0
+    contribs.keys.each do |term|
+      contribs[term] = self_vec[i] * other_vec[i]
+      i = i + 1
+      # puts "#{term} -> #{contribs[term]}"
+    end
+    contribs.sort_by { |term, value| value }
+  end
+
 end
